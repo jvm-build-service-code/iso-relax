@@ -24,3 +24,4 @@
 #DEFAULT (echo ""; id; echo %s; date; cat) >> $CVSROOT/CVSROOT/commitlog
 # or
 #DEFAULT (echo ""; id; echo %{sVv}; date; cat) >> $CVSROOT/CVSROOT/commitlog
+^www (date; cat; (sleep 2; cd /home/groups/i/is/iso-relax/htdocs; cvs update -dP) &) >> /home/groups/i/is/iso-relax/htdocs/updatelog 2>&1
