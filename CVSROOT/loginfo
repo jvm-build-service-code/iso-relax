@@ -27,4 +27,5 @@
 #
 # --- it's not working ---
 # ^www (date; cat; (sleep 2; cd /home/groups/i/is/iso-relax/htdocs; cvs update -dP) &) >> /home/groups/i/is/iso-relax/htdocs/updatelog 2>&1
-^www sleep 2; ssh iso-relax.sourceforge.net /home/groups/i/is/iso-relax/update.sh &
+# -- again, not working --
+# ^www sleep 2; ssh iso-relax.sourceforge.net /home/groups/i/is/iso-relax/update.sh &
