@@ -38,6 +38,7 @@ Written by <a href="mailto:kohsukekawaguchi@yahoo.com">Kohsuke KAWAGUCHI</a>
       <li><a href="#discovery">Finding implementation at Run-time</a>
       <li><a href="#failfast">Fail-Fast Design</a>
       <li><a href="#shortcut">Creating Verifier directly from VerifierFactory</a>
+      <li><a href="#jaxp">JAXP masquerading</a>
       <li><a href="#thread">Thread Affinity</a>
       <li><a href="#dtddetect">Schema Language Auto Detection</a>
     </ol>
@@ -47,6 +48,7 @@ Written by <a href="mailto:kohsukekawaguchi@yahoo.com">Kohsuke KAWAGUCHI</a>
       <li><a href="#ex_thread">Multi-threaded example</a>
       <li><a href="#ex_dom">DOM validation</a>
       <li><a href="#ex_sax">SAX validation</a>
+      <li><a href="#ex_jaxp">JAXP masquerading</a>
     </ol>
 </ol>
 
@@ -360,6 +362,31 @@ Verifier v = factory.newVerifier(x);
 
 
 
+
+<a name="jaxp">
+<h3>JAXP Masquerading</h3>
+<p>
+	JAXP masquerading feature is a wrapper implementation of <a href="http://java.sun.com/xml/jaxp.html">JAXP</a>. This wrapper enhances another JAXP implementation (such as Aelfred or Crimson) by adding JARV-based validation capability to it. Parsing is done by the wrapped JAXP implementation, and JARV implementation adds advanced validation capability to it.
+</p><p>
+	This is often the easiest way to incorporate the validation into your application. Since it's just so easy to use.
+</p><p>
+	To create a wrapped <code>SAXParserFactory</code>, do as follows:
+</p>
+<pre>
+Schema schema = /* compile schema */;
+SAXParserFactory parserFactory = new org.iso_relax.jaxp.ValidatingSAXParserFactory(schema);
+</pre>
+<p>
+	This will create a JAXP SAXParserFactory that validates every parsed document by the specified schema. Similarly, to create a wrapped <code>DocumentBuilder</code>, do as follows:
+</p>
+<pre>
+Schema schema = /* compile schema */;
+DocumentBuilderFactory dbf = new org.iso_relax.jaxp.ValidatingDocumentBuilderFactory(schema);
+</pre>
+<p>
+	Once those instances are created, just use them as you use a normal JAXP implementation.
+</p>
+
 <a name="thread">
 <h3>Thread Affinity</h3>
 <p>
@@ -511,6 +538,56 @@ void f( javax.xml.parsers.SAXParserFactory parserFactory )
   // parse the document
   try {
     filter.parse( "MyInstance.xml" );
+    // if the execution reaches here, the document was valid and
+    // there was nothing wrong.
+  } catch( SAXException e ) {
+    // error.
+    
+    // maybe the document is not well-formed, or it's not valid
+    // or some other reasons.
+  }
+}
+</pre>
+
+
+
+<a name="ex_jaxp">
+<h3>JAXP Masquerading</h3>
+<p>
+	The following code shows how you can use JARV via JAXP-masquerading.
+</p>
+<pre>
+import org.iso_relax.verifier.*;
+import org.iso_relax.jaxp.*;
+
+void f()
+{
+  // create a RELAX NG validator
+  VerifierFactory factory = VerifierFactory.newInstance(
+                       "http://relaxng.org/ns/structure/1.0");
+
+  // compile a schema
+  Schema schema = factory.compileSchema( new File("myschema.rng") );
+  
+  // wrap it into a JAXP
+  SAXParserFactory parserFactory = new ValidatingSAXParserFactory(schema);
+  
+  // create a new XMLReader from it
+  parserFactory.setNamespaceAware(true);
+  XMLReader reader = parserFactory.newSAXParser().getXMLReader();
+  
+  // set an error handler
+  // this error handler will throw an exception if there is an well-formedness
+  // error or a validation error.
+  reader.setErrorHandler( new MyErrorHandler() );
+  
+  // set the content handler
+  reader.setContentHandler( new MyContentHandler() );
+  
+  
+  // parse the document
+  try {
+    reader.parse( "MyInstance.xml" );
     // if the execution reaches here, the document was valid and
     // there was nothing wrong.
   } catch( SAXException e ) {

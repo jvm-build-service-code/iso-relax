@@ -1,0 +1,108 @@
+<html>
+<head>
+	<title>JARV Ant task</title>
+	<meta HTTP-EQUIV="Content-Type" CONTENT="text/html; CHARSET=iso-8859-1">
+	<style>
+		pre { background-color: rgb(230,230,230); }
+	</style>
+</head>
+<body>
+<h1>JARV Ant Task</h1>
+<div align=right>
+	$Revision$ by <a href="mailto:kk@kohsuke.org">Kohsuke Kawaguchi</a>
+</div>
+
+
+
+<p>
+	JARV comes with an <a href="http://jakarta.apache.org/ant">Ant</a> task implementation that makes it easy to use Ant to automate validation. This document describes how you can use it.
+</p>
+
+<h2>Simple example</h2>
+<p>
+</p>
+<pre><xmp>
+<project .... >
+  ...
+  
+  <taskdef name="validate" classname="org.iso_relax.ant.JARVTask">
+    <classpath path="isorelax.jar"/>
+    <classpath path="msv.jar"/>
+  </taskdef>
+  
+  <target ... >
+    ...
+    <validate
+      schemaLanguage="http://relaxn.org/ns/structure/1.0"
+      schema="myschema.rng"
+      file="mydocument.xml />
+    ...
+    <validate
+      schemaLanguage="http://relaxn.org/ns/structure/1.0"
+      schema="myschema.rng">
+      
+      <fileset dir="xml" includes="*.xmldoc"/>
+    </validate>
+  </target>
+</project>
+</xmp></pre>
+<p>
+	First, you need to declare <code>org.iso_relax.ant.JARVTask</code> as a task by using a <code>taskdef</code> task. You should also specify the jar file of the validator implementation you'll be using. In this example, <a href="http://www.sun.com/xml">MSV</a> is specified.
+</p><p>
+	To validate documents with a schema, you need to specify three parameters. A schema language (by the <code>schemaLanguage</code> attribute), a schema file (by the <code>schema</code> attribute), and XML files to be validated.
+</p><p>
+	A schema language is specified by passing its name, which is usually its namespace URI. Refer to <a href="http://iso-relax.sourceforge.net/apiDoc/org/iso_relax/verifier/VerifierFactory.html#newInstance(java.lang.String)">this list</a> for the names of major schema languages.
+</p><p>
+	XML files can be specified either by a file attribute or by nested <code>fileset</code> elements. The latter allows multiple files to be specified easily. See <a href="http://jakarta.apache.org/ant/manual/CoreTypes/fileset.html">the documentation of Ant</a> for details of the syntax of <code>fileset</code>.
+</p>
+
+<h2>Synoposis</h2>
+<p>
+	The JARV task supports the following parameter attributes.
+</p>
+<table border=1>
+<thead>
+	<tr><td>
+		Attribute
+	</td><td>
+		Description
+	</td><td>
+		Required
+	</td></tr>
+<tbody>
+	<tr><td>
+		schemaLanguage
+	</td><td>
+		Specifies the schema language of the schema file.
+		See <a href="http://iso-relax.sourceforge.net/apiDoc/org/iso_relax/verifier/VerifierFactory.html#newInstance(java.lang.String)">this list</a> for possible values.
+	</td><td>
+		Yes
+	</td></tr>
+	<tr><td>
+		schema
+	</td><td>
+		Specifies the name of a schema file that validates documents.
+	</td><td>
+		Yes
+	</td></tr>
+	<tr><td>
+		file
+	</td><td>
+		Specifies a XML file to be validated against the specified schema.
+	</td><td>
+		No
+	</td></tr>
+</table>
+<p>
+	Following nested element parameter is supported.
+</p>
+<h3>fileset</h3>
+<p>
+	Specifies the set of files that will be validated against the schema. Multiple <code>fileset</code> elements can be specified. For the syntax, see <a href="http://jakarta.apache.org/ant/manual/CoreTypes/fileset.html">the ant documentation</a>.
+</p><p>
+	By specifying neither a file attribute or nested file sets, you can check the correctness of the specified schema file.
+</p>
+
+
+</body>
+</html>
