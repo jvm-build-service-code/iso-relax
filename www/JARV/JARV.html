@@ -572,8 +572,11 @@ void f()
   // wrap it into a JAXP
   SAXParserFactory parserFactory = new ValidatingSAXParserFactory(schema);
   
-  // create a new XMLReader from it
+  // configure it
   parserFactory.setNamespaceAware(true);
+  parserFactory.setValidating(true);
+  
+  // create a new XMLReader from it
   XMLReader reader = parserFactory.newSAXParser().getXMLReader();
   
   // set an error handler
