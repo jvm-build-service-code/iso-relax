@@ -6,11 +6,11 @@
 		<tstamp />
 		
 		<!-- compile files -->
-		<mkdir	dir="temp" />
-		<javac	srcdir="src" debug="true"
-				destdir="temp"
-				classpath="lib/verifier.jar">
-			<include name="**/*.java" />
+		<mkdir dir="temp" />
+		<javac srcdir="src" debug="true" destdir="temp">
+			<classpath>
+				<fileset dir="lib" includes="*.jar" />
+			</classpath>
 		</javac>
 		
 		<!-- create a time stamp file -->
@@ -25,6 +25,7 @@
 					<exclude name="*.vjp"/>
 					<exclude name="codebase.dat"/>
 					<exclude name="*.SRG"/>
+					<exclude name="CVS" />
 				</patternset>
 			</fileset>
 		</zip>
@@ -32,7 +33,7 @@
 		<!-- creates binary jar -->
 		<delete file="isorelax.jar"/>
 		<jar	jarfile="isorelax.jar"
-				compress="true">
+				compress="false">
 			<fileset dir="temp" />
 			<fileset dir="" includes="COPYING.txt"/>
 			<!-- resource files -->
@@ -51,27 +52,5 @@
 		<zip zipfile="isorelax.${DSTAMP}.zip" compress="true">
 			<fileset dir="." includes="isorelax.jar src.zip COPYING.txt"/>
 		</zip>
-	</target>
-	
-	
-	<!-- ant task test -->
-	<target name="ant-task-test">
-		<taskdef name="jarv" classname="org.iso_relax.ant.JARVTask">
-			<classpath path="isorelax.jar"/>
-			<classpath path="lib/verifier.jar"/>
-			<classpath path="lib/verifier.manifest.jar"/>
-		</taskdef>
-		
-		<jarv
-			schemaLanguage="http://www.xml.gr.jp/xmlns/relaxCore"
-			schema="test/relax001.rlx"
-			file="test/relax001.v00.xml" />
-		
-		<jarv
-			schemaLanguage="http://www.xml.gr.jp/xmlns/relaxCore"
-			schema="test/relax001.rlx">
-			
-			<fileset dir="test" includes="*.xml"/>
-		</jarv>
 	</target>
 </project>
